@@ -1,3 +1,2 @@
-# JUNO
+# Munity
 
-Whatsapp super bot
