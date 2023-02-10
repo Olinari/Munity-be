@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const participantSchema = new mongoose.Schema({
   phone: { type: String, required: true },
   isAdmin: { type: Boolean },
-  messages: { type: Number },
+  messages: { type: Number, default: 0 },
   profilePicUrl: { type: String },
 });
 
@@ -17,13 +17,13 @@ export const groupSchema = new mongoose.Schema({
   groupProfilePic: { type: String },
   ownerSerialized: { type: String },
   participants: { type: [participantSchema] },
-  messages: { type: Number },
+  messages: { type: Number, default: 0 },
+  topContributorIndex: {
+    type: Number,
+  },
   messagesDisterbution: {
     type: [Number],
     default: Array(24).fill(0),
-  },
-  topContributor: {
-    type: participantSchema,
   },
 });
 

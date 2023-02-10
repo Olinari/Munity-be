@@ -22,27 +22,34 @@ export const syncGroups = (groups, client) => {
       const filter = { name: groupId };
 
       try {
-        await groupModel.findOneAndUpdate(
-          filter,
-          {
-            name: groupId,
-            createdAt,
-            subject,
-            ownerPhone,
-            ownerSerialized,
-            adminProfilePic: await client.getProfilePicUrl(ownerSerialized),
-            participants: participants.map(({ id, isAdmin, isSuperAdmin }) => ({
+        const currentGroup = await groupModel.findOne(filter);
+
+        await groupModel.findOneAndUpdate(filter, {
+          name: groupId,
+          createdAt,
+          subject,
+          ownerPhone,
+          ownerSerialized,
+          adminProfilePic: await client.getProfilePicUrl(ownerSerialized),
+          topContributorIndex: currentGroup.participants.reduce(
+            (maxIndex, participant, currentIndex) => {
+              return participant.messages >
+                currentGroup.participants[maxIndex].messages
+                ? currentIndex
+                : maxIndex;
+            },
+            0
+          ),
+          participants: participants.map(
+            ({ id, isAdmin, isSuperAdmin }, index) => ({
               phone: id.user,
               isAdmin,
               isSuperAdmin,
               profilePic: client.getProfilePicUrl(`${id.user}@c.us`),
-            })),
-          },
-          {
-            new: true,
-            upsert: true,
-          }
-        );
+              messages: currentGroup.participants?.[index]?.messages,
+            })
+          ),
+        });
       } catch (error) {
         console.error(error);
       }
