@@ -1,4 +1,17 @@
 
-calculate pick acitiity times
-calculate top contributers
-sentiment text 
+
+---------Mvp-----------
+calculate pick acitiity times for each day
+[bug] calculate-groups setInterval stops being called after to runs 
+weekly/monthly/yearly aggrgation + UI
+handle members exiting the gruop
+resotre whatsapp session on server reboot (descide if local auth or mongo)
+users and authentication
+deploy and CI/CD
+
+---------Out of scope-----------
+message type (Media video text)
+detect mvp messages
+detect replies
+sentiment text (English)
+trpc

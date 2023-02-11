@@ -19,37 +19,45 @@ export const syncGroups = (groups, client) => {
         },
       } = group;
 
-      const filter = { name: groupId };
-
       try {
+        const filter = { name: groupId };
         const currentGroup = await groupModel.findOne(filter);
+        const syncdPatricipants = await Promise.all(
+          participants.map(async ({ id, isAdmin, isSuperAdmin }, index) => ({
+            phone: id.user,
+            isAdmin,
+            isSuperAdmin,
+            messages: currentGroup.participants?.[index]?.messages,
+            profilePicUrl: await client.getProfilePicUrl(id._serialized),
+          }))
+        );
 
-        await groupModel.findOneAndUpdate(filter, {
-          name: groupId,
-          createdAt,
-          subject,
-          ownerPhone,
-          ownerSerialized,
-          adminProfilePic: await client.getProfilePicUrl(ownerSerialized),
-          topContributorIndex: currentGroup.participants.reduce(
-            (maxIndex, participant, currentIndex) => {
-              return participant.messages >
-                currentGroup.participants[maxIndex].messages
-                ? currentIndex
-                : maxIndex;
+        const topContributorIndex = currentGroup.participants.reduce(
+          (maxIndex, participant, currentIndex) => {
+            return participant.messages >
+              currentGroup.participants[maxIndex].messages
+              ? currentIndex
+              : maxIndex;
+          },
+          0
+        );
+
+        await groupModel.updateOne(
+          filter,
+          {
+            $set: {
+              name: groupId,
+              createdAt,
+              subject,
+              ownerPhone,
+              ownerSerialized,
+              adminProfilePic: await client.getProfilePicUrl(ownerSerialized),
+              participants: syncdPatricipants,
+              topContributorIndex,
             },
-            0
-          ),
-          participants: participants.map(
-            ({ id, isAdmin, isSuperAdmin }, index) => ({
-              phone: id.user,
-              isAdmin,
-              isSuperAdmin,
-              profilePic: client.getProfilePicUrl(`${id.user}@c.us`),
-              messages: currentGroup.participants?.[index]?.messages,
-            })
-          ),
-        });
+          },
+          { upsert: true }
+        );
       } catch (error) {
         console.error(error);
       }
@@ -73,7 +81,7 @@ export const updateGroupWithMessage = async (message) => {
     );
 
     //update participant's number of messages sent in the group
-    await groupModel.findOneAndUpdate(
+    await groupModel.updateOne(
       { name },
       {
         $inc: {
