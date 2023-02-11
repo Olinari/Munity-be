@@ -1,4 +1,4 @@
-import { connectAgent } from "./whatsapp-web/whatsapp-web-agent.js";
+import { connectWhatsappAgent } from "./whatsapp-web/whatsapp-web-agent.js";
 import {
   syncGroups,
   getGroups,
@@ -15,11 +15,17 @@ export default (app) => {
   app.use(cors()); // parse application/x-www-form-urlencoded
   app.use(bodyParser.urlencoded({ extended: false })); // parse application/json
   app.use(bodyParser.json());
+  const { getAuthData, createClient, restoreSession } = connectWhatsappAgent();
+
+  restoreSession().then((session) => {
+    whatsappAgent.isConnected = session.isConnected;
+    whatsappAgent.client = session.client;
+  });
 
   app.get("/connect-agent", async (req, res) => {
     if (!whatsappAgent.isConnected) {
+      console.log("to");
       try {
-        const { getAuthData, createClient } = connectAgent();
         const authData = await getAuthData();
 
         if (authData.qr) {

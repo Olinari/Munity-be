@@ -3,6 +3,7 @@ import express from "express";
 import mongoose from "mongoose";
 import api from "./index.js";
 import { ServerApiVersion } from "mongodb";
+import { connectWhatsappAgent } from "./whatsapp-web/whatsapp-web-agent.js";
 
 dotenv.config();
 
@@ -16,6 +17,8 @@ try {
 } catch (error) {
   console.error(error);
 }
+
+const { getAuthData, createClient, restoreSession } = connectWhatsappAgent();
 
 const app = api(express());
 
