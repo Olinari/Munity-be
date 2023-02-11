@@ -9,61 +9,19 @@ import { getTimeline } from "./controllers/time-controller.js";
 import cors from "cors";
 import bodyParser from "body-parser";
 
-const whatsappAgent = { isConnected: false };
-
-export default (app) => {
+export default (app, client) => {
   app.use(cors()); // parse application/x-www-form-urlencoded
   app.use(bodyParser.urlencoded({ extended: false })); // parse application/json
   app.use(bodyParser.json());
-  const { getAuthData, createClient, restoreSession } = connectWhatsappAgent();
-
-  restoreSession().then((session) => {
-    whatsappAgent.isConnected = session.isConnected;
-    whatsappAgent.client = session.client;
-  });
-
-  app.get("/connect-agent", async (req, res) => {
-    if (!whatsappAgent.isConnected) {
-      try {
-        const authData = await getAuthData();
-
-        if (authData.qr) {
-          res.send({ qr: authData.qr });
-        }
-
-        const { isConnected, client } = await createClient();
-        whatsappAgent.isConnected = isConnected;
-        whatsappAgent.client = client;
-      } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: error.message });
-      }
-    }
-  });
-
-  app.get("/secure-connection", async (req, res) => {
-    try {
-      res.send({ connected: whatsappAgent.isConnected });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  app.post("/disconnect", async (req, res) => {
-    console.log("bye bye");
-    whatsappAgent.isConnected = false;
-    whatsappAgent.client = null;
-  });
 
   app.post("/groups-calculator", async (req, res) => {
-    if (whatsappAgent.isConnected) {
+    if (client.isConnected) {
       console.log("Calculating Groups");
       try {
-        const chats = await whatsappAgent.client.getChats();
+        const chats = await client.getChats();
         const groups = chats.filter((chat) => chat.isGroup);
 
-        syncGroups(groups, whatsappAgent.client);
+        syncGroups(groups, client);
       } catch (error) {
         res.status(500).json({ message: "err" });
       }
