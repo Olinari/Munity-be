@@ -24,7 +24,6 @@ export default (app) => {
 
   app.get("/connect-agent", async (req, res) => {
     if (!whatsappAgent.isConnected) {
-      console.log("to");
       try {
         const authData = await getAuthData();
 
