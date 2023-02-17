@@ -6,7 +6,7 @@ const daySchema = new mongoose.Schema({
     {
       name: { type: String },
       messages: { type: Number, default: 1 },
-      messagesDisterbution: {
+      messagesDistribution: {
         type: [Number],
         default: Array(24).fill(0),
       },
@@ -16,10 +16,6 @@ const daySchema = new mongoose.Schema({
           messages: { type: Number, default: 1 },
         },
       ],
-      messagesDistribution: {
-        type: [Number],
-        default: Array(24).fill(0),
-      },
     },
   ],
 });

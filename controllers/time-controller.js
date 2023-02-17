@@ -19,10 +19,6 @@ export const getDailyGroupInfo = async (date, groupId) => {
 export const updateDayWithMessage = async ({ message, groupName }) => {
   const today = new Date().setHours(0, 0, 0, 0);
   const now = new Date().getHours();
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
   const userPhone = message.author.split("@")[0];
 
   try {
@@ -50,11 +46,7 @@ export const updateDayWithMessage = async ({ message, groupName }) => {
           $inc: {
             "groups.$[group].messages": 1,
             "groups.$[group].participants.$[participant].messages": 1,
-<<<<<<< Updated upstream
             [`groups.$[group].messagesDistribution.${now}`]: 1,
-=======
-            [`messagesDistribution.${now}`]: 1,
->>>>>>> Stashed changes
           },
         },
         {
