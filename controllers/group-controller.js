@@ -1,9 +1,4 @@
 import { groupModel } from "../models/group-model.js";
-import { api } from "../api.js";
-
-setInterval(() => {
-  api.post(`groups-calculator`);
-}, 20000);
 
 export const syncGroups = (groups, client) => {
   groups.forEach(async (group) => {

@@ -1,7 +1,7 @@
 import qrcode from "qrcode-terminal";
 import wwbjs from "whatsapp-web.js";
 import { assignActions } from "./whatsapp-web-actions.js";
-import fs from "fs";
+import { syncGroups } from "../controllers/group-controller.js";
 import { MongoStore } from "wwebjs-mongo";
 import mongoose from "mongoose";
 
