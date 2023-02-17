@@ -12,8 +12,8 @@ export const getDailyGroupInfo = async (date, groupId) => {
     },
     { "groups.$": 1 }
   );
-  console.log(result.groups[0]);
-  return result.groups[0];
+
+  return result?.groups[0];
 };
 
 export const updateDayWithMessage = async ({ message, groupName }) => {

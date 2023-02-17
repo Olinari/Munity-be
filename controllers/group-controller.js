@@ -1,10 +1,6 @@
 import { groupModel } from "../models/group-model.js";
 import { api } from "../api.js";
 
-setInterval(() => {
-  api.post(`groups-calculator`);
-}, 20000);
-
 export const getGroups = async () => await groupModel.find();
 
 export const getGroupById = async (id) => {
