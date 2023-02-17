@@ -1,45 +1,39 @@
 import qrcode from "qrcode-terminal";
-import wwb from "whatsapp-web.js";
+import wwbjs from "whatsapp-web.js";
 import { assignActions } from "./whatsapp-web-actions.js";
+import fs from "fs";
+import { MongoStore } from "wwebjs-mongo";
+import mongoose from "mongoose";
 
-const TIME_OUT = 60000;
-const { Client } = wwb;
+const { Client, RemoteAuth } = wwbjs;
 
-export function connectAgent() {
-  const state = { haltNewQrs: false };
-  const client = new Client();
+export const connectWhatsappAgent = async () => {
+  const store = new MongoStore({ mongoose: mongoose });
+  const client = new Client({
+    authStrategy: new RemoteAuth({
+      store: store,
+      backupSyncIntervalMs: 60000,
+    }),
+  });
+
   client.initialize();
-  return {
-    getAuthData: () =>
-      new Promise((resolve) => {
-        const clearId = setTimeout(() => {
-          resolve(false);
-        }, TIME_OUT);
 
-        client.once("qr", (qr) => {
-          if (!state.isAuthenticated) {
-            qrcode.generate(qr, { small: true }, (qr) => {
-              clearTimeout(clearId);
-              resolve({ qr });
-            });
-          }
-        });
-      }),
+  client.on("qr", (qr) => {
+    qrcode.generate(qr, { small: true });
+  });
 
-    createClient: () =>
-      new Promise((resolve) => {
-        if (!state.haltNewQrs) {
-          state.haltNewQrs = true;
-          const clearId = setTimeout(() => {
-            resolve({ isConnected: false, client: null });
-          }, TIME_OUT);
+  client.on("remote_session_saved", () => {
+    console.log("session saved!");
+  });
 
-          client.once("ready", () => {
-            state.haltNewQrs = false;
-            clearTimeout(clearId);
-            resolve({ isConnected: true, client: assignActions(client) });
-          });
-        }
-      }),
-  };
-}
+  client.on("authenticated", () => {
+    console.log("Authenticated");
+  });
+
+  client.on("ready", () => {
+    console.log("Client is ready!");
+    client.isConnected = true;
+  });
+
+  return assignActions(client);
+};
