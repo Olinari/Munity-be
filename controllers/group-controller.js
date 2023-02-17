@@ -5,6 +5,13 @@ setInterval(() => {
   api.post(`groups-calculator`);
 }, 20000);
 
+export const getGroups = async () => await groupModel.find();
+
+export const getGroupById = async (id) => {
+  console.log(id);
+  return await groupModel.findOne({ _id: id });
+};
+
 export const syncGroups = (groups, client) => {
   groups.forEach(async (group) => {
     if (group.groupMetadata?.owner) {
@@ -23,24 +30,32 @@ export const syncGroups = (groups, client) => {
         const filter = { name: groupId };
         const currentGroup = await groupModel.findOne(filter);
         const syncdPatricipants = await Promise.all(
-          participants.map(async ({ id, isAdmin, isSuperAdmin }, index) => ({
-            phone: id.user,
-            isAdmin,
-            isSuperAdmin,
-            messages: currentGroup.participants?.[index]?.messages,
-            profilePicUrl: await client.getProfilePicUrl(id._serialized),
-          }))
+          participants
+            ? participants.map(
+                async ({ id, isAdmin, isSuperAdmin }, index) => ({
+                  phone: id.user,
+                  isAdmin,
+                  isSuperAdmin,
+                  messages: currentGroup
+                    ? currentGroup.participants?.[index]?.messages
+                    : 0,
+                  profilePicUrl: await client.getProfilePicUrl(id._serialized),
+                })
+              )
+            : []
         );
 
-        const topContributorIndex = currentGroup.participants.reduce(
-          (maxIndex, participant, currentIndex) => {
-            return participant.messages >
-              currentGroup.participants[maxIndex].messages
-              ? currentIndex
-              : maxIndex;
-          },
-          0
-        );
+        const topContributorIndex = currentGroup
+          ? currentGroup.participants.reduce(
+              (maxIndex, participant, currentIndex) => {
+                return participant.messages >
+                  currentGroup.participants[maxIndex].messages
+                  ? currentIndex
+                  : maxIndex;
+              },
+              0
+            )
+          : 0;
 
         await groupModel.updateOne(
           filter,
@@ -86,7 +101,7 @@ export const updateGroupWithMessage = async (message) => {
       {
         $inc: {
           "participants.$[participant].messages": 1,
-          [`messagesDisterbution.${now}`]: 1,
+          [`messagesDistribution.${now}`]: 1,
         },
       },
       {
@@ -99,11 +114,4 @@ export const updateGroupWithMessage = async (message) => {
   } catch (error) {
     console.error(error);
   }
-};
-
-export const getGroups = async () => await groupModel.find();
-
-export const getGroupById = async (id) => {
-  console.log(id);
-  return await groupModel.findOne({ _id: id });
 };

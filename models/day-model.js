@@ -12,6 +12,10 @@ const daySchema = new mongoose.Schema({
           messages: { type: Number, default: 1 },
         },
       ],
+      messagesDistribution: {
+        type: [Number],
+        default: Array(24).fill(0),
+      },
     },
   ],
 });
