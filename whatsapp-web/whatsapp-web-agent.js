@@ -30,9 +30,19 @@ export const connectWhatsappAgent = async () => {
     console.log("Authenticated");
   });
 
+  client.on("disconnected", () => {
+    clearInterval(client.ClearId);
+    console.log("bye");
+  });
+
   client.on("ready", () => {
     console.log("Client is ready!");
-    client.isConnected = true;
+    console.log("Calculating Groups");
+    client.ClearId = setInterval(async () => {
+      const chats = await client.getChats();
+      const groups = chats.filter((chat) => chat.isGroup);
+      syncGroups(groups, client);
+    }, 20000);
   });
 
   return assignActions(client);
