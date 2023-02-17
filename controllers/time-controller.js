@@ -2,10 +2,13 @@ import { dayModel } from "../models/day-model.js";
 
 export const updateDayWithMessage = async ({ message, groupName }) => {
   const today = new Date().setHours(0, 0, 0, 0);
+  const now = new Date().getHours();
+
   const userPhone = message.author.split("@")[0];
 
   try {
     const day = await dayModel.findOne({ date: today });
+
     console.log(day);
     if (!day) {
       const newDay = new dayModel({
@@ -28,6 +31,7 @@ export const updateDayWithMessage = async ({ message, groupName }) => {
           $inc: {
             "groups.$[group].messages": 1,
             "groups.$[group].participants.$[participant].messages": 1,
+            [`groups.$[group].messagesDistribution.${now}`]: 1,
           },
         },
         {

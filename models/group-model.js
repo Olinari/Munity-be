@@ -21,7 +21,7 @@ export const groupSchema = new mongoose.Schema({
   topContributorIndex: {
     type: Number,
   },
-  messagesDisterbution: {
+  messagesDistribution: {
     type: [Number],
     default: Array(24).fill(0),
   },
