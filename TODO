@@ -1,12 +1,8 @@
 --------Sprint #0---------
-
-[on it]calculate pick acitiity times for each day
 [on it]weekly/monthly/yearly aggrgation + UI
-[ ]handle members exiting the gruop
-[ ]users and authentication
-[ ]deploy and CI/CD
 [done] resotre whatsapp session on server reboot (descide if local auth or mongo)
 [done][bug] calculate-groups setInterval stops being called after to runs
+[done]calculate peak-acitivity hours for each day
 
 ---------Backlog-----------
 
@@ -14,5 +10,12 @@
 [ ]detect mvp messages
 [ ]detect replies
 [ ]sentiment text (English)
-[ ]trpc
-2
+[ ]users and authentication
+[ ]deploy and CI/CD
+[ ]handle members exiting the gruop
+[ ]handle
+
+Dev Backlog:
+-server to ts
+-trpc
+-suspend react components
