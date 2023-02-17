@@ -37,8 +37,9 @@ export const connectWhatsappAgent = async () => {
 
   client.on("ready", () => {
     console.log("Client is ready!");
-    console.log("Calculating Groups");
+
     client.ClearId = setInterval(async () => {
+      console.log("Calculating Groups");
       const chats = await client.getChats();
       const groups = chats.filter((chat) => chat.isGroup);
       syncGroups(groups, client);

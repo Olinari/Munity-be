@@ -1,9 +1,28 @@
 import { dayModel } from "../models/day-model.js";
+import { getGroupById } from "./group-controller.js";
+
+export const getDailyGroupInfo = async (date, groupId) => {
+  const group = await getGroupById(groupId);
+  console.log(group.name);
+
+  const result = await dayModel.findOne(
+    {
+      date: new Date(date).setHours(0, 0, 0, 0),
+      groups: { $elemMatch: { name: group.name } },
+    },
+    { "groups.$": 1 }
+  );
+  console.log(result.groups[0]);
+  return result.groups[0];
+};
 
 export const updateDayWithMessage = async ({ message, groupName }) => {
   const today = new Date().setHours(0, 0, 0, 0);
   const now = new Date().getHours();
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
   const userPhone = message.author.split("@")[0];
 
   try {
@@ -31,7 +50,11 @@ export const updateDayWithMessage = async ({ message, groupName }) => {
           $inc: {
             "groups.$[group].messages": 1,
             "groups.$[group].participants.$[participant].messages": 1,
+<<<<<<< Updated upstream
             [`groups.$[group].messagesDistribution.${now}`]: 1,
+=======
+            [`messagesDistribution.${now}`]: 1,
+>>>>>>> Stashed changes
           },
         },
         {
