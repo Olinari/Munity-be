@@ -1,12 +1,8 @@
-import { connectWhatsappAgent } from "./whatsapp-web/whatsapp-web-agent.js";
-import {
-  syncGroups,
-  getGroups,
-  getGroupById,
-} from "./controllers/group-controller.js";
+import { getGroups, getGroupById } from "./controllers/group-controller.js";
 import {
   getDailyGroupInfo,
   getTimeline,
+  getWeeklyMessageCounts,
 } from "./controllers/time-controller.js";
 
 import cors from "cors";
@@ -41,7 +37,18 @@ export default (app, client) => {
     const { date, groupId } = req.query;
     try {
       const data = await getDailyGroupInfo(date, groupId);
+      res.send(data);
+    } catch (error) {
+      res.status(500).json({ message: "err" });
+    }
+  });
 
+  app.get("/group-weekly-data", async (req, res) => {
+    const { date, groupId } = req.query;
+
+    try {
+      const data = await getWeeklyMessageCounts(date, groupId);
+      date, groupId;
       res.send(data);
     } catch (error) {
       res.status(500).json({ message: "err" });

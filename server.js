@@ -16,7 +16,6 @@ try {
   console.log("Mongo Connected");
   const client = connectWhatsappAgent();
   const app = api(express(), client);
-
   const PORT = process.env.PORT || 5501;
   app.listen(PORT, console.log(`Server started on port ${PORT}`));
 } catch (error) {

@@ -3,7 +3,6 @@ import { getGroupById } from "./group-controller.js";
 
 export const getDailyGroupInfo = async (date, groupId) => {
   const group = await getGroupById(groupId);
-  console.log(group.name);
 
   const result = await dayModel.findOne(
     {
@@ -14,6 +13,37 @@ export const getDailyGroupInfo = async (date, groupId) => {
   );
 
   return result?.groups[0];
+};
+
+export const getWeeklyMessageCounts = async (date, groupId) => {
+  const group = await getGroupById(groupId);
+  const weekEndDate = new Date(date);
+  const millisecondsInDay = 24 * 60 * 60 * 1000;
+  const weekStartDate = new Date(weekEndDate.getTime() - 6 * millisecondsInDay);
+
+  try {
+    const messageCounts = [];
+
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(
+        new Date(weekStartDate.getTime() + i * millisecondsInDay)
+      );
+      console.log(date, i);
+      const day = await dayModel.findOne({
+        date: date.setHours(0, 0, 0, 0),
+      });
+
+      if (day) {
+        const _group = day.groups.find((_group) => _group.name === group.name);
+        messageCounts.push(_group ? _group.messages ?? 0 : 0);
+      }
+      if (i < 6) messageCounts.push(0);
+    }
+
+    return messageCounts;
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 export const updateDayWithMessage = async ({ message, groupName }) => {
