@@ -25,19 +25,18 @@ export const getWeeklyMessageCounts = async (date, groupId) => {
     const messageCounts = [];
 
     for (let i = 0; i < 7; i++) {
-      const date = new Date(
-        new Date(weekStartDate.getTime() + i * millisecondsInDay)
-      );
-      console.log(date, i);
+      const date = new Date(weekStartDate);
+      date.setDate(date.getDate() + i);
       const day = await dayModel.findOne({
         date: date.setHours(0, 0, 0, 0),
       });
-
+      console.log(day);
       if (day) {
-        const _group = day.groups.find((_group) => _group.name === group.name);
+        const _group = day.groups.find((g) => g.name === group.name);
         messageCounts.push(_group ? _group.messages ?? 0 : 0);
+      } else {
+        messageCounts.push(0);
       }
-      if (i < 6) messageCounts.push(0);
     }
 
     return messageCounts;
