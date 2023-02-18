@@ -15,3 +15,4 @@
 [ ]handle members exiting the gruop
 [ ]users and authentication
 [ ]deploy and CI/CD
+[ ] bug - first daily message is ignored
