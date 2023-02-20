@@ -28,7 +28,7 @@ export default (app) => {
     const { ok, message, errorMessage } = await registerUser(user);
 
     if (ok) {
-      res.json({ message: "ok" });
+      res.json({ message });
     } else {
       res.json({ message: errorMessage });
     }
@@ -39,7 +39,7 @@ export default (app) => {
     const { ok, message, errorMessage } = await loginUser(user);
 
     if (ok) {
-      res.json({ message: "ok" });
+      res.json({ message });
     } else {
       res.json({ message: errorMessage });
     }
