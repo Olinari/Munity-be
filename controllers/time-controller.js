@@ -52,7 +52,6 @@ export const updateDayWithMessage = async ({ message, groupName }) => {
   try {
     const day = await dayModel.findOne({ date: today });
 
-    console.log(day);
     if (!day) {
       const newDay = new dayModel({
         date: today,

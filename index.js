@@ -8,11 +8,48 @@ import {
 import cors from "cors";
 import bodyParser from "body-parser";
 
-export default (app, client) => {
+import {
+  registerUser,
+  loginUser,
+  verifyJwt,
+} from "./controllers/user-controller";
+
+export default (app) => {
   app.use(cors()); // parse application/x-www-form-urlencoded
   app.use(bodyParser.urlencoded({ extended: false })); // parse application/json
   app.use(bodyParser.json());
 
+  //TODO add router for better context
+
+  //User routes
+
+  app.post("/register", async (req, res) => {
+    const user = req.body;
+    const { ok, message, errorMessage } = await registerUser(user);
+
+    if (ok) {
+      res.json({ message: "ok" });
+    } else {
+      res.json({ message: errorMessage });
+    }
+  });
+
+  app.post("/login", async (req, res) => {
+    const userDetails = req.body;
+    const { ok, message, errorMessage } = await loginUser(user);
+
+    if (ok) {
+      res.json({ message: "ok" });
+    } else {
+      res.json({ message: errorMessage });
+    }
+  });
+
+  app.get("get-username", verifyJwt, (req, res) => {
+    res.json({ isLoggedIn: true, username: req.user.username });
+  });
+
+  //Whatsapp routes
   app.get("/groups-data", async (req, res) => {
     try {
       const data = await getGroups();
