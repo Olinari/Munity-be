@@ -1,8 +1,8 @@
-import jwt from "jwt";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { userModel } from "../models/user-model.js";
 
-export const registerNewUser = async (user) => {
+export const registerUser = async (user) => {
   const alreadyExist = !!userModel.findOne({ email: user.email });
   if (alreadyExist) {
     return {

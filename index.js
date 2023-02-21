@@ -12,7 +12,7 @@ import {
   registerUser,
   loginUser,
   verifyJwt,
-} from "./controllers/user-controller";
+} from "./controllers/user-controller.js";
 
 export default (app) => {
   app.use(cors()); // parse application/x-www-form-urlencoded
