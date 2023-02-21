@@ -9,7 +9,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  phone: { type: String, required: true },
+  phone: { type: String },
+  isGodMode: { type: Boolean },
   createdAt: { type: Date, default: Date.now },
 });
 

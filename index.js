@@ -4,7 +4,7 @@ import {
   getTimeline,
   getWeeklyMessageCounts,
 } from "./controllers/time-controller.js";
-
+import jwt from "jsonwebtoken";
 import cors from "cors";
 import bodyParser from "body-parser";
 
@@ -24,28 +24,43 @@ export default (app) => {
   //User routes
 
   app.post("/register", async (req, res) => {
-    const user = req.body;
-    const { ok, message, errorMessage } = await registerUser(user);
+    const { user } = req.body;
 
+    const { ok, message, errorMessage } = await registerUser(user);
+    console.log(errorMessage);
     if (ok) {
       res.json({ message });
     } else {
-      res.json({ message: errorMessage });
+      res.status(500).send({ error: errorMessage });
     }
   });
 
   app.post("/login", async (req, res) => {
-    const userDetails = req.body;
-    const { ok, message, errorMessage } = await loginUser(user);
+    const { user } = req.body;
+    console.log(await loginUser(user));
+    const { ok, payload, errorMessage } = await loginUser(user);
 
     if (ok) {
-      res.json({ message });
+      return jwt.sign(
+        payload,
+        process.env.JWT_KEY,
+        { expiresIn: 86400 },
+        (err, token) => {
+          if (err) {
+            return res.status(500).send({ error: err });
+          }
+          return res.send({
+            ok: true,
+            token,
+          });
+        }
+      );
     } else {
-      res.json({ message: errorMessage });
+      res.status(500).send({ error: errorMessage });
     }
   });
 
-  app.get("get-username", verifyJwt, (req, res) => {
+  app.get("/restore-login", verifyJwt, (req, res) => {
     res.json({ isLoggedIn: true, username: req.user.username });
   });
 

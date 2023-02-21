@@ -3,7 +3,8 @@ import bcrypt from "bcrypt";
 import { userModel } from "../models/user-model.js";
 
 export const registerUser = async (user) => {
-  const alreadyExist = !!userModel.findOne({ email: user.email });
+  const alreadyExist = await userModel.findOne({ email: user.email });
+  console.log(user, alreadyExist);
   if (alreadyExist) {
     return {
       ok: false,
@@ -11,7 +12,7 @@ export const registerUser = async (user) => {
     };
   }
 
-  const password = await bcrypt.hash(user.password);
+  const password = await bcrypt.hash(user.password, 10);
 
   new userModel({
     email: user.email,
@@ -42,38 +43,22 @@ export const loginUser = async (userDetails) => {
     };
   }
 
-  const payload = {
-    id: user._id,
-    username: user.username,
+  return {
+    ok: true,
+    payload: { id: user._id, username: user.username },
   };
-
-  jwt.sign(
-    payload,
-    process.env.JWT_SECRET,
-    { expiresIn: 86400 },
-    (err, token) => {
-      if (err) {
-        return res.json({
-          ok: false,
-          errorMessage: err,
-        });
-      }
-      return res.json({
-        ok: true,
-        token,
-      });
-    }
-  );
 };
 
 export const verifyJwt = (req, res, next) => {
-  const token = req.headers["x-access-token"]?.split(" ")[1];
+  let token = req.headers["x-access-token"];
+
   if (!token) {
     res.json({ ok: false, message: "Incorrect Token Given" });
   }
 
-  jwt.verify(token, process.env.PASSPORTSECRET, (err, decoded) => {
+  jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
     if (err) {
+      console.log(err);
       return res.json({
         ok: false,
         message: "Failed to Authenticate",
@@ -82,7 +67,6 @@ export const verifyJwt = (req, res, next) => {
 
     req.user = {};
     req.user.id = decoded.id;
-    req.user.username = decoded.username;
     next();
   });
 };
