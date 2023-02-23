@@ -1,6 +1,5 @@
 
 .idea
-.env
 .DS_Store
 *.suo
 *.ntvs*
