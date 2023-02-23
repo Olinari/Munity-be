@@ -10,6 +10,7 @@ const { Client, RemoteAuth } = wwbjs;
 export const connectWhatsappAgent = async () => {
   const store = new MongoStore({ mongoose: mongoose });
   const client = new Client({
+    puppeteer: { args: ["--no-sandbox"] },
     authStrategy: new RemoteAuth({
       store: store,
       backupSyncIntervalMs: 60000,
