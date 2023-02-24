@@ -3,7 +3,7 @@ import { getGroupById } from "./group-controller.js";
 
 export const getDailyGroupInfo = async (date, groupId) => {
   const group = await getGroupById(groupId);
-
+  console.log(date, group);
   const result = await dayModel.findOne(
     {
       date: new Date(date).setHours(0, 0, 0, 0),
@@ -11,7 +11,7 @@ export const getDailyGroupInfo = async (date, groupId) => {
     },
     { "groups.$": 1 }
   );
-
+  console.log(result);
   return result?.groups[0];
 };
 
@@ -33,7 +33,6 @@ export const getWeeklyMessageCounts = async (date, groupId) => {
       });
 
       if (day) {
-        console.log(day.groups, group.name);
         const _group = day.groups.find((g) => g.name === group.name);
         messageCounts.push(_group ? _group.messages ?? 0 : 0);
       } else {
