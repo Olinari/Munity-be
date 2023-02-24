@@ -44,7 +44,7 @@ export const connectWhatsappAgent = async () => {
       const chats = await client.getChats();
       const groups = chats.filter((chat) => chat.isGroup);
       syncGroups(groups, client);
-    }, 20000);
+    }, 5000);
   });
 
   return assignActions(client);
