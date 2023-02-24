@@ -16,6 +16,7 @@ export const getDailyGroupInfo = async (date, groupId) => {
 };
 
 export const getWeeklyMessageCounts = async (date, groupId) => {
+  console.log(groupId);
   const group = await getGroupById(groupId);
   const weekEndDate = new Date(date);
   const millisecondsInDay = 24 * 60 * 60 * 1000;
@@ -30,9 +31,7 @@ export const getWeeklyMessageCounts = async (date, groupId) => {
       const day = await dayModel.findOne({
         date: date.setHours(0, 0, 0, 0),
       });
-      /*       console.log(day, "day");
-      console.log(date, "date");
-      console.log(await (await dayModel.find()).map((_) => _.date)); */
+
       if (day) {
         console.log(day.groups, group.name);
         const _group = day.groups.find((g) => g.name === group.name);
