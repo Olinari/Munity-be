@@ -49,7 +49,7 @@ export default (app) => {
 
   app.post("/login", async (req, res) => {
     const { user } = req.body;
-    console.log(await loginUser(user));
+    await loginUser(user);
     const { ok, payload, errorMessage } = await loginUser(user);
 
     if (ok) {

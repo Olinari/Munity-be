@@ -2,27 +2,21 @@ import { dayModel } from "../models/day-model.js";
 import { getGroupById } from "./group-controller.js";
 
 export const getDailyGroupInfo = async (date, groupId) => {
-  try {
-    const group = await getGroupById(groupId);
+  const group = await getGroupById(groupId);
 
-    const result = await dayModel.findOne(
-      {
-        date: new Date(date).setHours(0, 0, 0, 0),
-        groups: { $elemMatch: { name: group.name } },
-      },
-      { "groups.$": 1 }
-    );
+  const result = await dayModel.findOne(
+    {
+      date: new Date(date).setHours(0, 0, 0, 0),
+      groups: { $elemMatch: { name: group.name } },
+    },
+    { "groups.$": 1 }
+  );
 
-    return result?.groups[0];
-  } catch (error) {
-    console.error(error);
-  }
+  return result?.groups[0];
 };
 
 export const getWeeklyMessageCounts = async (date, groupId) => {
-  console.log(date, groupId);
   const group = await getGroupById(groupId);
-  console.log(group);
   const weekEndDate = new Date(date);
   const millisecondsInDay = 24 * 60 * 60 * 1000;
   const weekStartDate = new Date(weekEndDate.getTime() - 6 * millisecondsInDay);
@@ -37,13 +31,14 @@ export const getWeeklyMessageCounts = async (date, groupId) => {
         date: date.setHours(0, 0, 0, 0),
       });
       if (day) {
+        console.log(day);
         const _group = day.groups.find((g) => g.name === group.name);
         messageCounts.push(_group ? _group.messages ?? 0 : 0);
       } else {
         messageCounts.push(0);
       }
     }
-    console.log(messageCounts);
+
     return messageCounts;
   } catch (err) {
     console.log(err);
