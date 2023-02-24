@@ -11,7 +11,11 @@ export const getDailyGroupInfo = async (date, groupId) => {
     },
     { "groups.$": 1 }
   );
-  console.log(await dayModel.find());
+  console.log(
+    await dayModel.findOne({
+      date: new Date(date).setHours(0, 0, 0, 0),
+    })
+  );
   return result?.groups[0];
 };
 
