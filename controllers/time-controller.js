@@ -31,6 +31,7 @@ export const getWeeklyMessageCounts = async (date, groupId) => {
         date: date.setHours(0, 0, 0, 0),
       });
       console.log(day, "day");
+      console.log(date, "date");
       if (day) {
         console.log(day);
         const _group = day.groups.find((g) => g.name === group.name);
