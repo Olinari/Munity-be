@@ -34,10 +34,9 @@ export const getWeeklyMessageCounts = async (date, groupId) => {
       console.log(date, "date");
       console.log(await (await dayModel.find()).map((_) => _.date)); */
       if (day) {
+        console.log(day.groups, group.name);
         const _group = day.groups.find((g) => g.name === group.name);
-
         messageCounts.push(_group ? _group.messages ?? 0 : 0);
-        console.log(_group, messageCounts);
       } else {
         messageCounts.push(0);
       }
