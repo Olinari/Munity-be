@@ -6,12 +6,12 @@ export const getDailyGroupInfo = async (date, groupId) => {
   console.log(date, group);
   const result = await dayModel.findOne(
     {
-      date: { $eq: new Date(date).setHours(0, 0, 0, 0) },
+      date: { $eq: new Date(date).substr(0, 10) },
       groups: { $elemMatch: { name: group.name } },
     },
     { "groups.$": 1 }
   );
-  console.log(await dayModel.find());
+  console.log(result);
   return result?.groups[0];
 };
 
