@@ -35,7 +35,10 @@ export const syncGroups = (groups, client) => {
                   messages: currentGroup
                     ? currentGroup.participants?.[index]?.messages
                     : 0,
-                  profilePicUrl: await client.getProfilePicUrl(id._serialized),
+                  profilePicUrl:
+                    //Temp solution to prevent errors for whatsapp-web.js
+                    currentGroup.profilePicUrl ??
+                    (await client.getProfilePicUrl(id._serialized)),
                 })
               )
             : []
