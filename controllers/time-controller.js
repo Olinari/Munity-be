@@ -6,7 +6,7 @@ export const getDailyGroupInfo = async (date, groupId) => {
   console.log(date, group);
   const result = await dayModel.findOne(
     {
-      date: new Date(date).setHours(0, 0, 0, 0),
+      date: { $eq: new Date(date).setHours(0, 0, 0, 0) },
       groups: { $elemMatch: { name: group.name } },
     },
     { "groups.$": 1 }
