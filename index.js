@@ -35,6 +35,18 @@ export default (app) => {
     }
   });
 
+  app.post("/register", async (req, res) => {
+    const { user } = req.body;
+
+    const { ok, message, errorMessage } = await registerUser(user);
+    console.log(errorMessage);
+    if (ok) {
+      res.json({ message });
+    } else {
+      res.status(500).send({ error: errorMessage });
+    }
+  });
+
   app.post("/login", async (req, res) => {
     const { user } = req.body;
     console.log(await loginUser(user));
@@ -100,7 +112,7 @@ export default (app) => {
 
     try {
       const data = await getWeeklyMessageCounts(date, groupId);
-      date, groupId;
+      console.log(data);
       res.send(data);
     } catch (error) {
       res.status(500).json({ message: "err" });
