@@ -2,17 +2,22 @@ import { dayModel } from "../models/day-model.js";
 import { getGroupById } from "./group-controller.js";
 
 export const getDailyGroupInfo = async (date, groupId) => {
-  const group = await getGroupById(groupId);
+  const isoDateString = new Date(date).toISOString().split("T")[0];
+  try {
+    const group = await getGroupById(groupId);
 
-  const result = await dayModel.findOne(
-    {
-      date: new Date(date.toISOString().split("T")[0]),
-      groups: { $elemMatch: { name: group.name } },
-    },
-    { "groups.$": 1 }
-  );
+    const result = await dayModel.findOne(
+      {
+        date: new Date(isoDateString),
+        groups: { $elemMatch: { name: group.name } },
+      },
+      { "groups.$": 1 }
+    );
 
-  return result?.groups[0];
+    return result?.groups[0];
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export const getWeeklyMessageCounts = async (date, groupId) => {
