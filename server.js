@@ -7,6 +7,8 @@ import { connectWhatsappAgent } from "./whatsapp-web/whatsapp-web-agent.js";
 
 dotenv.config();
 
+const isJunoDemo = true;
+
 try {
   await mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -15,7 +17,8 @@ try {
   });
   console.log("Mongo Connected");
 
-  const client = connectWhatsappAgent();
+  const client = await connectWhatsappAgent();
+
   const app = api(express(), client);
   const PORT = process.env.PORT || 5501;
   app.listen(PORT, console.log(`Server started on port ${PORT}`));

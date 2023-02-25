@@ -14,7 +14,11 @@ import {
   verifyJwt,
 } from "./controllers/user-controller.js";
 
-export default (app) => {
+import { generateJunoClient } from "./juno-demo/juno.js";
+
+const junosKids = [];
+
+export default (app, juno) => {
   app.use(cors()); // parse application/x-www-form-urlencoded
   app.use(bodyParser.urlencoded({ extended: false })); // parse application/json
   app.use(bodyParser.json());
@@ -22,18 +26,6 @@ export default (app) => {
   //TODO add router for better context
 
   //User routes
-
-  app.post("/register", async (req, res) => {
-    const { user } = req.body;
-
-    const { ok, message, errorMessage } = await registerUser(user);
-    console.log(errorMessage);
-    if (ok) {
-      res.json({ message });
-    } else {
-      res.status(500).send({ error: errorMessage });
-    }
-  });
 
   app.post("/register", async (req, res) => {
     const { user } = req.body;
@@ -125,6 +117,51 @@ export default (app) => {
       res.send(data);
     } catch (error) {
       res.status(500).json({ message: "err" });
+    }
+  });
+
+  //juno-demo
+
+  app.get("/juno/connect-client", async (req, res) => {
+    const phone = req.query.phone;
+    try {
+      const { getQr, createClient } = generateJunoClient({
+        phone,
+        admin: juno,
+      });
+      const authData = await getQr();
+      if (authData) {
+        res.send({ qr: authData });
+        const { isConnected, client } = await createClient();
+        junosKids[phone] = { isConnected, client };
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/juno/secure-client", async (req, res) => {
+    try {
+      const phone = req.query.phone;
+
+      res.send({ connected: junosKids[phone]?.isConnected });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/juno/disconnect-client", async (req, res) => {
+    try {
+      const phone = req.query.phone;
+
+      junosKids[phone] = null;
+
+      res.send({ message: "ok", connected: false });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: error.message });
     }
   });
 

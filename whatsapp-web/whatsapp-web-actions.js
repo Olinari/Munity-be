@@ -1,4 +1,3 @@
-import { api } from "../api.js";
 import { updateGroupWithMessage } from "../controllers/group-controller.js";
 import { updateDayWithMessage } from "../controllers/time-controller.js";
 
@@ -11,7 +10,7 @@ const actions = {
       console.log(error);
     }
   },
-  disconnected: () => api.post("disconnect"),
+  /*   disconnected: () => api.post("disconnect"), */
 };
 
 export const assignActions = (client) => {
