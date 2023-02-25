@@ -32,11 +32,9 @@ export function generateJunoClient({ phone, admin }) {
         });
 
         client.once("qr", (qr) => {
-          if (state.isAuthenticated) {
-            resolve(false);
-          }
           qrcode.generate(qr, { small: true }, (qr) => {
             clearTimeout(clearId);
+            console.log(qr);
             resolve(qr);
           });
         });
