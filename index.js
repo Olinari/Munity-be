@@ -155,9 +155,7 @@ export default (app, juno) => {
   app.post("/juno/disconnect-client", async (req, res) => {
     try {
       const phone = req.query.phone;
-
       junosKids[phone] = null;
-
       res.send({ message: "ok", connected: false });
     } catch (error) {
       console.log(error);

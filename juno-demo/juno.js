@@ -15,7 +15,9 @@ export function generateJunoClient({ phone, admin }) {
     },
   });
 
-  client.initialize();
+  client.initialize((ex) => {
+    console.log(ex);
+  });
 
   return {
     getQr: () =>
@@ -55,6 +57,11 @@ export function generateJunoClient({ phone, admin }) {
               isConnected: true,
               client: assignJunoActions(client, admin, phone),
             });
+
+            setTimeout(async () => {
+              await client.destroy();
+              await api.post(`juno/disconnect-client?phone=${parentPhone}`);
+            }, 300000);
           });
         }
       }),
@@ -64,31 +71,46 @@ export function generateJunoClient({ phone, admin }) {
 const assignJunoActions = (client, juno, parentPhone) => {
   const actions = {
     message: async (message) => {
-      const { offensiveMessage, labels } = await measureToxicity(message.body);
-      if (offensiveMessage) {
-        juno.sendMessage(
-          `${parentPhone}@c.us`,
-          `Ariel's phone recieved messages you should know about.`
+      try {
+        const { offensiveMessage, labels } = await measureToxicity(
+          message.body
         );
-        juno.sendMessage(`${parentPhone}@c.us`, `Message: ${message}`);
-        labels.forEach((label) => {
-          juno.sendMessage(`${phone}@c.us`, `Message contains ${label}`);
-        });
+        if (offensiveMessage) {
+          juno.sendMessage(
+            `${parentPhone}@c.us`,
+            `Ariel's phone recieved messages you should know about.`
+          );
+          juno.sendMessage(`${parentPhone}@c.us`, `Message: ${message}`);
+          labels.forEach((label) => {
+            juno.sendMessage(`${phone}@c.us`, `Message contains ${label}`);
+          });
+        }
+      } catch (error) {
+        console.log(error);
       }
     },
     message_create: async (message) => {
-      const { offensiveMessage, labels } = await measureToxicity(message.body);
-      if (offensiveMessage) {
-        juno.sendMessage(
-          `${parentPhone}@c.us`,
-          `Ariel's phone sent messages you should know about.`
+      try {
+        const { offensiveMessage, labels } = await measureToxicity(
+          message.body
         );
-        labels.forEach((label) => {
-          juno.sendMessage(`${parentPhone}@c.us`, `Message contains ${label}`);
-        });
+        if (offensiveMessage) {
+          juno.sendMessage(
+            `${parentPhone}@c.us`,
+            `Ariel's phone sent messages you should know about.`
+          );
+          labels.forEach((label) => {
+            juno.sendMessage(
+              `${parentPhone}@c.us`,
+              `Message contains ${label}`
+            );
+          });
+        }
+      } catch (error) {
+        console.log(error);
       }
-
-      /* if (message.hasMedia) {
+    },
+    /* if (message.hasMedia) {
         const media = await message.downloadMedia();
         console.log(media.mimetype);
         fs.writeFile(
@@ -99,19 +121,25 @@ const assignJunoActions = (client, juno, parentPhone) => {
             console.log("success");
           }
         );
-      } */
+      }  
     },
-    disconnected: () => {
-      const { message, isConnected } = api.post(
-        `/juno/disconnect-client?phone=${parentPhone}`
-      );
+    disconnected: async () => {
+      try {
+      } catch (error) {
+        console.log(error);
+      }
 
-      if (message === "ok" && isConnected === false) {
-        console.log("message");
+      const response = 
+
+      if (
+        response.data.message === "ok" &&
+        response.data.isConnected === false
+      ) {
+        console.log("client destroyed");
       }
     },
+    */
   };
-
   Object.keys(actions).forEach((event) => {
     client.on(event, (args) => actions[event]?.(args));
   });
