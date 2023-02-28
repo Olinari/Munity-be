@@ -7,7 +7,7 @@
 *.sln
 *.sw?
 node_modules/
-
+.env
 
 # Editor directories and files
 .vscode/
