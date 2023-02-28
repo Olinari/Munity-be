@@ -7,8 +7,6 @@ import { connectWhatsappAgent } from "./whatsapp-web/whatsapp-web-agent.js";
 
 dotenv.config();
 
-const isJunoDemo = true;
-
 try {
   await mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,

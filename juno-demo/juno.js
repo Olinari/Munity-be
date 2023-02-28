@@ -2,6 +2,8 @@ import qrcode from "qrcode-terminal";
 import wwb from "whatsapp-web.js";
 import { api } from "../api.js";
 import toxicity from "@tensorflow-models/toxicity";
+import axios from "axios";
+import fs from "fs";
 
 const { Client } = wwb;
 
@@ -58,7 +60,7 @@ export function generateJunoClient({ phone, admin }) {
 
             setTimeout(async () => {
               await client.destroy();
-              await api.post(`juno/disconnect-client?phone=${parentPhone}`);
+              await api.post(`juno/disconnect-client?phone=${phone}`);
             }, 300000);
           });
         }
@@ -88,55 +90,40 @@ const assignJunoActions = (client, juno, parentPhone) => {
       }
     },
     message_create: async (message) => {
-      try {
-        const { offensiveMessage, labels } = await measureToxicity(
-          message.body
-        );
-        if (offensiveMessage) {
-          juno.sendMessage(
-            `${parentPhone}@c.us`,
-            `Ariel's phone sent messages you should know about.`
+      if (!message.hasMedia) {
+        try {
+          const { offensiveMessage, labels } = await measureToxicity(
+            message.body
           );
-          labels.forEach((label) => {
+          if (offensiveMessage) {
             juno.sendMessage(
               `${parentPhone}@c.us`,
-              `Message contains ${label}`
+              `Ariel's phone sent messages you should know about.`
             );
-          });
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    /* if (message.hasMedia) {
-        const media = await message.downloadMedia();
-        console.log(media.mimetype);
-        fs.writeFile(
-          `./myfile${Math.random(400) * 10}.${media.mimetype.split("/")[1]}`,
-          media.data,
-          "base64",
-          () => {
-            console.log("success");
+            labels.forEach((label) => {
+              juno.sendMessage(
+                `${parentPhone}@c.us`,
+                `Message contains ${label}`
+              );
+            });
           }
-        );
-      }  
-    },
-    disconnected: async () => {
-      try {
-      } catch (error) {
-        console.log(error);
+        } catch (error) {
+          console.log(error);
+        }
       }
 
-      const response = 
-
-      if (
-        response.data.message === "ok" &&
-        response.data.isConnected === false
-      ) {
-        console.log("client destroyed");
-      }
+      const media = await message.downloadMedia();
+      console.log(media.mimetype);
+      /*  fs.writeFile(
+        `./myfile${Math.random(400) * 10}.${media.mimetype.split("/")[1]}`,
+        media.data,
+        "base64",
+        () => {
+          console.log("success");
+        }
+      ); */
+      transcribeSpeech(media);
     },
-    */
   };
   Object.keys(actions).forEach((event) => {
     client.on(event, (args) => actions[event]?.(args));
@@ -164,3 +151,32 @@ const measureToxicity = async (sentence) => {
     console.log(error);
   }
 };
+
+async function transcribeSpeech(audioFile) {
+  const BASE_URL = "https://speech.googleapis.com/v1/speech:recognize";
+
+  // Set up the request body
+  const requestBody = {
+    config: {
+      encoding: "OGG_OPUS",
+      sampleRateHertz: 16000,
+      languageCode: "en-US",
+    },
+    audio: {
+      content: audioFile,
+    },
+  };
+
+  // Set up the request parameters
+  const params = {
+    key: process.env.GOOGLE_API_KEY,
+  };
+
+  try {
+    const response = await axios.post(BASE_URL, requestBody, { params });
+    const transcript = response.data.results[0].alternatives[0].transcript;
+    console.log(`Transcription: ${transcript}`);
+  } catch (error) {
+    console.error(error);
+  }
+}
