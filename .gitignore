@@ -65,3 +65,4 @@ RemoteAuth.zip
 .snap/*
 .pm2
 .pm2/*
+./public
