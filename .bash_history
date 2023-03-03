@@ -458,3 +458,252 @@ npm ci
 npm i @tensorflow-models/speech-commands
 npm i
 npm i @tensorflow-models/speech-commands
+npm i @tensorflow-models/speech-commands --force
+git add .
+git commit -m"fuck-me"
+"
+git config --global user.email "ariel0lin@gmail.com"
+git commit -m"asd"
+git push
+git config --global user.email "ariel0lin@gmail.com"
+git commit -m"asd"
+git push
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 re
+npm i node-pcm-utils
+npm i node-pcm-utils --force
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+npm install wav
+npm install wav --force
+pm2 restart munity
+pm2 logs
+pm2 delete munity
+pm2 start server.js --name munity
+pm2 logs
+pm2 start server.js --name munity
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+npm i
+npm i --force
+npm audit fix --force
+mpm i
+npm i
+npm i --force
+npm fund
+pm2 restart munity
+npm i --force
+pm2 restart munity
+npm i --force
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+npm i node-pcm-utils --force
+npm i pcm-utils
+npm i pcm-utils --force
+npm install pcm
+npm install pcm --force
+npm i wav --force
+pm2 restart munity
+pm2 logs
+npm i vorbis
+npm i vorbis --foece
+npm i vorbis --force
+npm i vorbis --foece
+npm i vorbis --force
+sudo apt-get install build-essential
+npm install vorbis
+npm install vorbis --force
+sudo apt-get install build-essential
+npm install vorbis --force
+pm2 restart munity
+npm i wav-decoder --force
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+npm install ogg-opus-decoder --force
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 log2
+pm2 logs
+pm2 log2
+pm2 restart munity
+pm2 log2
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+npm i vosk
+npm i vosk --force
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+mpm i
+npm i
+npm i tensorflow-models/toxicity
+npm i --force
+npm i
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+npm i
+pm2 restart munity
+npm i
+pm2 restart munity
+npm i
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+npm i node-opus
+npm i node-wav'
+pm2 restart munity
+pm2 logs
+npm i node-wav
+pm2 restart munity
+pm2 logs
+Once you've installed ogg-packet, you can modify the preprocessData function to u
+npm install ogg-packet
+rm -rf node_modules
+npm install
+npm install ogg-packet
+pm2 restart munity
+pm2 logs
+npm i ogg-packet
+npm i ogg-packet --force
+npm i @discordjs/opus
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 log2
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+npm i vorbis
