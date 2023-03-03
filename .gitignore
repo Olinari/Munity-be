@@ -60,6 +60,6 @@ RemoteAuth.zip
 .lesshst
 .profile
 .viminfo
-
+.bash_history
 .snap/
 .snap/*
