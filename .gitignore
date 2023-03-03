@@ -66,3 +66,4 @@ RemoteAuth.zip
 .pm2
 .pm2/*
 ./public
+./public/*
