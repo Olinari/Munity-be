@@ -23,8 +23,8 @@ export default (app, juno) => {
   app.use(bodyParser.urlencoded({ extended: false })); // parse application/json
   app.use(bodyParser.json());
 
-  //TODO add router for better context
 
+  //TODO add router for better context:
   //User routes
 
   app.post("/register", async (req, res) => {

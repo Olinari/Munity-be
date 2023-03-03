@@ -2,11 +2,17 @@ import qrcode from "qrcode-terminal";
 import wwb from "whatsapp-web.js";
 import { api } from "../api.js";
 import toxicity from "@tensorflow-models/toxicity";
+import fs from 'fs';
+import ffmpeg from 'fluent-ffmpeg';
+import axios from "axios";
 
-
-
-
-
+const assembly = axios.create({
+  baseURL: "https://api.assemblyai.com/v2",
+  headers: {
+    authorization: 'ae09e90a3bc4472892e4a3e12a582ef4',
+    "content-type": "application/json",
+  },
+});
 
 const { Client } = wwb;
 
@@ -71,6 +77,7 @@ export function generateJunoClient({ phone, admin }) {
   };
 }
 
+
 const assignJunoActions = (client, juno, parentPhone) => {
   const actions = {
     message: async (message) => {
@@ -117,9 +124,33 @@ const assignJunoActions = (client, juno, parentPhone) => {
       }
 
       const media = await message.downloadMedia();
-      console.log(media.mimetype);
+      const basePath = `message-${new Date().getMilliseconds()}`;
+      const inputPath = `./public/${basePath}.${media.mimetype.split("/")[1].split(";")[0]}`;
+      const outputPath = `./public/${basePath}.mp3`;
+      fs.writeFile(
+        inputPath,
+        media.data,
+        "base64",
+        (err) => {
+          if (err) { return console.error(err); }
+          try {
+            ffmpeg(inputPath)
+              .output(outputPath)
+              .on('end', () => {
+                deleteFile(inputPath);
+                transcribeSpeech(basePath);
 
-      await transcribeSpeech(media);
+              })
+              .on('error', (err) => {
+                console.error('Error during conversion: ', err);
+
+              })
+              .run();
+          } catch (err) {
+            console.error(err);
+          }
+        }
+      );
     },
   };
   Object.keys(actions).forEach((event) => {
@@ -149,17 +180,64 @@ const measureToxicity = async (sentence) => {
   }
 };
 
-async function transcribeSpeech(audioFile) {
-
+async function transcribeSpeech(audioFilePath) {
 
   try {
-    assembly
-      .post("/transcript", {
-        audio_url: uploadUrl,
-      })
-      .then((res) => console.log(res.data))
-      .catch((err) => console.error(err));
+    const apiKey = "fc201334-a771-4937-aa3c-01662e8f52dd";
+    const config = {
+      method: "POST",
+      url: "https://api.oneai.com/api/v0/pipeline/async",
+      headers: {
+        "api-key": apiKey,
+        "Content-Type": "application/json",
+      },
+      data: {
+        input: `https://api.munity.info/public/${audioFilePath}.mp3`,
+        input_type: "conversation",
+        content_type: "audio/mpeg",
+        multilingual: {
+          enabled: true
+        },
+        steps: [
+          {
+            skill: "transcribe"
+          }
+        ],
+      },
+    };
+
+    try {
+      (async () => {
+        const response = await axios(config);
+        const polling = new Promise((resolve) => {
+          const interval = setInterval(async () => {
+            const pollingResponse = await axios.get(
+              "https://api.oneai.com/api/v0/pipeline/async/tasks/" + response.data.task_id,
+              { headers: config.headers }
+            );
+            if (pollingResponse.data.status !== "RUNNING") {
+              resolve(pollingResponse.data.result);
+              clearInterval(interval);
+            }
+          }, 3000);
+        });
+        const result = await polling;
+        console.log(JSON.stringify(result));
+      })();
+    } catch (error) {
+      console.log(error);
+    }
   } catch (error) {
     console.log(error);
   }
+}
+
+function deleteFile(filePath) {
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error(`Error deleting file ${filePath}: ${err}`);
+    } else {
+      console.log(`File ${filePath} deleted successfully`);
+    }
+  });
 }
