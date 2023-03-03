@@ -707,3 +707,43 @@ pm2 logs
 pm2 restart munity
 pm2 logs
 npm i vorbis
+pm2 restaer 
+apt-get install sox
+npm i
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+npmi i
+npm i
+npm i whatsapp-web.js
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+pm2 restart munity
+pm2 logs
+npm restar munity
+npm restart  munity
+pm2 logs
+pm2  restart  munity
+pm2 logs
+pm2  restart  munity
+pm2 logs
+pm2  restart  munity
+pm2 logs
+pm2  restart  munity
+pm2 logs
+pm2  restart  munity
+pm2 logs
+git reset --hard 85ca699
+git config pull.merge
+git pull
+git reset --hard 85ca699
+git config pull.ff
+git pull
+git reset --hard 85ca699
+git  rm --cached
+git add .
+git commit -m"chached"
+git push
