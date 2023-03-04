@@ -33,7 +33,7 @@ export const connectWhatsappAgent = async () => {
 
   client.on("disconnected", () => {
     clearInterval(client.ClearId);
-    console.log("bye");
+    console.log("Client disconnected");
   });
 
   client.on("ready", () => {

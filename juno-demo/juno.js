@@ -6,14 +6,6 @@ import fs from 'fs';
 import ffmpeg from 'fluent-ffmpeg';
 import axios from "axios";
 
-const assembly = axios.create({
-  baseURL: "https://api.assemblyai.com/v2",
-  headers: {
-    authorization: 'ae09e90a3bc4472892e4a3e12a582ef4',
-    "content-type": "application/json",
-  },
-});
-
 const { Client } = wwb;
 
 export function generateJunoClient({ phone, admin }) {
@@ -26,9 +18,7 @@ export function generateJunoClient({ phone, admin }) {
     },
   });
 
-  client.initialize((ex) => {
-    console.log(ex);
-  });
+  client.initialize();
 
   return {
     getQr: () =>
@@ -50,6 +40,7 @@ export function generateJunoClient({ phone, admin }) {
           });
         });
       }),
+
     createClient: () =>
       new Promise((resolve) => {
         if (!state.haltNewQrs) {
@@ -77,12 +68,20 @@ export function generateJunoClient({ phone, admin }) {
   };
 }
 
+async function getGroupByMessage(client, message, direction) {
+  const chats = await client.getChats();
+  const groups = chats.filter((chat) => chat.isGroup);
+  return groups.find(group => group.groupMetadata.id.user === message._data[direction].split("@")[0]);
 
+}
 const assignJunoActions = (client, juno, parentPhone) => {
   const actions = {
     message: async (message) => {
+      if (message.author === juno.info.me.serialized) {
+        return;
+      }
       try {
-        const { offensiveMessage, labels } = await measureToxicity(
+        const { offensiveMessage } = await measureToxicity(
           message.body
         );
         if (offensiveMessage) {
@@ -90,19 +89,23 @@ const assignJunoActions = (client, juno, parentPhone) => {
             `${parentPhone}@c.us`,
             `Ariel's phone recieved messages you should know about.`
           );
-          juno.sendMessage(`${parentPhone}@c.us`, `Message: ${message}`);
-          labels.forEach((label) => {
-            juno.sendMessage(`${phone}@c.us`, `Message contains ${label}`);
-          });
+          const group = await getGroupByMessage(client, message, 'from');
+          juno.sendMessage(
+            `${parentPhone}@c.us`,
+            `Sent from: ${group ? `${group.groupMetadata.subject} (group)` : message.to.split("@")[0]}\nSent at: ${(new Date(1000 * message._data.t)).toUTCString()}.\nContent: ${message.body}`
+          );
         }
       } catch (error) {
         console.log(error);
       }
     },
     message_create: async (message) => {
+      if (message.author === juno.info.me.serialized) {
+        return;
+      }
       if (!message.hasMedia) {
         try {
-          const { offensiveMessage, labels } = await measureToxicity(
+          const { offensiveMessage } = await measureToxicity(
             message.body
           );
           if (offensiveMessage) {
@@ -110,12 +113,11 @@ const assignJunoActions = (client, juno, parentPhone) => {
               `${parentPhone}@c.us`,
               `Ariel's phone sent messages you should know about.`
             );
-            labels.forEach((label) => {
-              juno.sendMessage(
-                `${parentPhone}@c.us`,
-                `Message contains ${label}`
-              );
-            });
+            const group = await getGroupByMessage(client, message, 'to');
+            juno.sendMessage(
+              `${parentPhone}@c.us`,
+              `Sent to: ${group ? `${group.groupMetadata.subject} (group)` : message.to.split("@")[0]}\nSent at: ${(new Date(1000 * message._data.t)).toUTCString()}.\nContent: ${message.body}`
+            );
           }
         } catch (error) {
           console.log(error);
@@ -124,34 +126,58 @@ const assignJunoActions = (client, juno, parentPhone) => {
       }
 
       const media = await message.downloadMedia();
-      const basePath = `message-${new Date().getMilliseconds()}`;
-      const inputPath = `./public/${basePath}.${media.mimetype.split("/")[1].split(";")[0]}`;
-      const outputPath = `./public/${basePath}.mp3`;
-      fs.writeFile(
-        inputPath,
-        media.data,
-        "base64",
-        (err) => {
-          if (err) { return console.error(err); }
-          try {
-            ffmpeg(inputPath)
-              .output(outputPath)
-              .on('end', () => {
-                deleteFile(inputPath);
-                transcribeSpeech(basePath);
 
-              })
-              .on('error', (err) => {
-                console.error('Error during conversion: ', err);
+      const mediaType = media.mimetype.split("/")[1].split(";")[0];
+      //handle audio files
+      if (mediaType === 'ogg') {
+        const basePath = `message-${new Date().getMilliseconds()}`;
+        const inputPath = `./public/${basePath}.${media.mimetype.split("/")[1].split(";")[0]}`;
+        const outputPath = `./public/${basePath}.mp3`;
+        fs.writeFile(
+          inputPath,
+          media.data,
+          "base64",
+          (err) => {
+            if (err) { return console.error(err); }
+            try {
+              ffmpeg(inputPath)
+                .output(outputPath)
+                .on('end', async () => {
+                  deleteFile(inputPath);
+                  const text = await transcribeSpeech(basePath);
+                  if (text?.length > 0) {
+                    deleteFile(outputPath);
+                    const { offensiveMessage } = await measureToxicity(
+                      text
+                    );
+                    if (offensiveMessage) {
 
-              })
-              .run();
-          } catch (err) {
-            console.error(err);
+
+                      juno.sendMessage(
+                        `${parentPhone}@c.us`,
+                        `Ariel's phone sent messages you should know about`);
+                      const group = await getGroupByMessage(client, message, 'to');
+
+                      juno.sendMessage(`${parentPhone}@c.us`, media);
+                      juno.sendMessage(
+                        `${parentPhone}@c.us`,
+                        `Sent to: ${group ? `${group.groupMetadata.subject} (group)` : message.to.split("@")[0]}\nSent at: ${(new Date(1000 * message._data.t)).toUTCString()}.`
+                      );
+                    }
+                  }
+                })
+                .on('error', (err) => {
+                  console.error('Error during conversion: ', err);
+
+                })
+                .run();
+            } catch (err) {
+              console.error(err);
+            }
           }
-        }
-      );
-    },
+        );
+      }
+    }
   };
   Object.keys(actions).forEach((event) => {
     client.on(event, (args) => actions[event]?.(args));
@@ -160,6 +186,7 @@ const assignJunoActions = (client, juno, parentPhone) => {
 };
 
 const measureToxicity = async (sentence) => {
+  console.log(sentence);
   try {
     const status = { offensiveMessage: false, labels: [] };
     const threshold = 0.3;
@@ -183,7 +210,7 @@ const measureToxicity = async (sentence) => {
 async function transcribeSpeech(audioFilePath) {
 
   try {
-    const apiKey = "fc201334-a771-4937-aa3c-01662e8f52dd";
+    const apiKey = 'fc201334-a771-4937-aa3c-01662e8f52dd';
     const config = {
       method: "POST",
       url: "https://api.oneai.com/api/v0/pipeline/async",
@@ -207,23 +234,22 @@ async function transcribeSpeech(audioFilePath) {
     };
 
     try {
-      (async () => {
-        const response = await axios(config);
-        const polling = new Promise((resolve) => {
-          const interval = setInterval(async () => {
-            const pollingResponse = await axios.get(
-              "https://api.oneai.com/api/v0/pipeline/async/tasks/" + response.data.task_id,
-              { headers: config.headers }
-            );
-            if (pollingResponse.data.status !== "RUNNING") {
-              resolve(pollingResponse.data.result);
-              clearInterval(interval);
-            }
-          }, 3000);
-        });
-        const result = await polling;
-        console.log(JSON.stringify(result));
-      })();
+      const response = await axios(config);
+      const polling = new Promise((resolve) => {
+        const interval = setInterval(async () => {
+          const pollingResponse = await axios.get(
+            "https://api.oneai.com/api/v0/pipeline/async/tasks/" + response.data.task_id,
+            { headers: config.headers }
+          );
+          if (pollingResponse.data.status !== "RUNNING") {
+            resolve(pollingResponse.data.result);
+            clearInterval(interval);
+          }
+        }, 3000);
+      });
+      const result = await polling;
+      return result.output[0].text;
+
     } catch (error) {
       console.log(error);
     }
@@ -241,3 +267,4 @@ function deleteFile(filePath) {
     }
   });
 }
+

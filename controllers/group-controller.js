@@ -28,32 +28,32 @@ export const syncGroups = (groups, client) => {
         const syncdPatricipants = await Promise.all(
           participants
             ? participants.map(
-                async ({ id, isAdmin, isSuperAdmin }, index) => ({
-                  phone: id.user,
-                  isAdmin,
-                  isSuperAdmin,
-                  messages: currentGroup
-                    ? currentGroup.participants?.[index]?.messages
-                    : 0,
-                  profilePicUrl:
-                    //Temp solution to prevent errors for whatsapp-web.js
-                    currentGroup.profilePicUrl ??
-                    (await client?.getProfilePicUrl(id._serialized)),
-                })
-              )
+              async ({ id, isAdmin, isSuperAdmin }, index) => ({
+                phone: id.user,
+                isAdmin,
+                isSuperAdmin,
+                messages: currentGroup
+                  ? currentGroup.participants?.[index]?.messages
+                  : 0,
+                profilePicUrl:
+                  //Temp solution to prevent errors for whatsapp-web.js
+                  currentGroup.profilePicUrl ??
+                  (await client?.getProfilePicUrl(id._serialized)),
+              })
+            )
             : []
         );
 
         const topContributorIndex = currentGroup
           ? currentGroup.participants.reduce(
-              (maxIndex, participant, currentIndex) => {
-                return participant.messages >
-                  currentGroup.participants[maxIndex].messages
-                  ? currentIndex
-                  : maxIndex;
-              },
-              0
-            )
+            (maxIndex, participant, currentIndex) => {
+              return participant.messages >
+                currentGroup.participants[maxIndex].messages
+                ? currentIndex
+                : maxIndex;
+            },
+            0
+          )
           : 0;
 
         await groupModel.updateOne(
@@ -80,6 +80,7 @@ export const syncGroups = (groups, client) => {
 };
 
 export const updateGroupWithMessage = async (message) => {
+  console.log(message);
   const name = message.from.split("@")[0];
   const userPhone = message.author.split("@")[0];
   const now = new Date().getHours();
