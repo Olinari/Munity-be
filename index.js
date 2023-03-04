@@ -104,7 +104,6 @@ export default (app, juno) => {
 
     try {
       const data = await getWeeklyMessageCounts(date, groupId);
-      console.log(data);
       res.send(data);
     } catch (error) {
       res.status(500).json({ message: "err" });
@@ -122,11 +121,14 @@ export default (app, juno) => {
 
   //juno-demo
 
-  app.get("/juno/connect-client", async (req, res) => {
-    const phone = req.query.phone;
+  app.post("/juno/connect-client", async (req, res) => {
+    const phone = req.body.phone;
+    const name = req.body.name;
+    console.log(phone, name);
     try {
       const { getQr, createClient } = generateJunoClient({
         phone,
+        name,
         admin: juno,
       });
       const authData = await getQr();
@@ -144,7 +146,6 @@ export default (app, juno) => {
   app.get("/juno/secure-client", async (req, res) => {
     try {
       const phone = req.query.phone;
-
       res.send({ connected: junosKids[phone]?.isConnected });
     } catch (error) {
       console.log(error);

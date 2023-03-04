@@ -8,7 +8,7 @@ import axios from "axios";
 
 const { Client } = wwb;
 
-export function generateJunoClient({ phone, admin }) {
+export function generateJunoClient({ phone, name, admin }) {
   const state = { haltNewQrs: false };
 
   const client = new Client({
@@ -55,7 +55,7 @@ export function generateJunoClient({ phone, admin }) {
             clearTimeout(clearId);
             resolve({
               isConnected: true,
-              client: assignJunoActions(client, admin, phone),
+              client: assignJunoActions(client, admin, phone, name),
             });
 
             setTimeout(async () => {
@@ -74,7 +74,7 @@ async function getGroupByMessage(client, message, direction) {
   return groups.find(group => group.groupMetadata.id.user === message._data[direction].split("@")[0]);
 
 }
-const assignJunoActions = (client, juno, parentPhone) => {
+const assignJunoActions = (client, juno, parentPhone, childName = "Child") => {
   const actions = {
     message: async (message) => {
       if (message.author === juno.info.me.serialized) {
@@ -87,7 +87,7 @@ const assignJunoActions = (client, juno, parentPhone) => {
         if (offensiveMessage) {
           juno.sendMessage(
             `${parentPhone}@c.us`,
-            `Ariel's phone recieved messages you should know about.`
+            `${childName}'s phone recieved messages you should know about.`
           );
           const group = await getGroupByMessage(client, message, 'from');
           juno.sendMessage(
@@ -111,7 +111,7 @@ const assignJunoActions = (client, juno, parentPhone) => {
           if (offensiveMessage) {
             juno.sendMessage(
               `${parentPhone}@c.us`,
-              `Ariel's phone sent messages you should know about.`
+              `${childName}'s phone sent messages you should know about.`
             );
             const group = await getGroupByMessage(client, message, 'to');
             juno.sendMessage(
@@ -155,7 +155,7 @@ const assignJunoActions = (client, juno, parentPhone) => {
 
                       juno.sendMessage(
                         `${parentPhone}@c.us`,
-                        `Ariel's phone sent messages you should know about`);
+                        `${childName}'s phone sent messages you should know about`);
                       const group = await getGroupByMessage(client, message, 'to');
 
                       juno.sendMessage(`${parentPhone}@c.us`, media);
